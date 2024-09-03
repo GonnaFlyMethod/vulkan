@@ -86,24 +86,34 @@ void VulkanRenderer::createLogicalDevice()
 	// TODO: cache index by introducing a property in the class/structure
 	QueueFamilyIndices indices = getQueueFamilies(mainDevice.physicalDevice);
 
-	VkDeviceQueueCreateInfo queueCreateInfo = {};
+	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 	
-	queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-	queueCreateInfo.queueFamilyIndex = indices.graphicsFamily; // Index of a family to create queue from
-	queueCreateInfo.queueCount = 1;  // Number of queues to create;
+	std::set<int> queueFamilyIndeces = { 
+		indices.graphicsFamily, indices.presentationFamily
+	};
 
-	float priority = 1.0f;
+	for (int queueFamilyIndex: queueFamilyIndeces) {
+		VkDeviceQueueCreateInfo queueCreateInfo = {};
 
-	// Normalized priority for handling multiple queues (1 = highest priority, 0 - lowest)
-	queueCreateInfo.pQueuePriorities = &priority;
+		queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+		queueCreateInfo.queueFamilyIndex = queueFamilyIndex; // Index of a family to create queue from
+		queueCreateInfo.queueCount = 1;  // Number of queues to create;
+
+		float priority = 1.0f;
+
+		// Normalized priority for handling multiple queues (1 = highest priority, 0 - lowest)
+		queueCreateInfo.pQueuePriorities = &priority;
+
+		queueCreateInfos.push_back(queueCreateInfo);
+	}
 
 	VkDeviceCreateInfo deviceCreateInfo = {};
 
 	deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-	deviceCreateInfo.queueCreateInfoCount = 1;  // Number of Queue create infos
-	
+	deviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());  // Number of Queue create infos
+
 	//  List of queue create infos, so device can create required queues
-	deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo; 
+	deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data(); 
 	deviceCreateInfo.enabledExtensionCount = 0;  // Number of enabled logical device extensions
 	deviceCreateInfo.ppEnabledExtensionNames = nullptr; // List of enabled logical device extensions
 	
@@ -124,6 +134,7 @@ void VulkanRenderer::createLogicalDevice()
 	// From give logical device, of given queue family, of given Queue index (0 since only one queue),
 	// place reference in given VkQueue
 	vkGetDeviceQueue(mainDevice.logicalDevice, indices.graphicsFamily, 0, &graphicsQueue);
+	vkGetDeviceQueue(mainDevice.logicalDevice, indices.presentationFamily, 0, &presentationQueue);
 }
 
 void VulkanRenderer::createSurface()

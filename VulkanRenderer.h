@@ -5,6 +5,7 @@
 
 #include <stdexcept>
 #include <vector>
+#include <set>
 
 #include "Utilities.h"
 
@@ -27,6 +28,8 @@ private:
 	} mainDevice;
 
 	VkQueue graphicsQueue;
+	VkQueue presentationQueue;
+
 	VkSurfaceKHR surface;
 
 	// Vulkan functions
