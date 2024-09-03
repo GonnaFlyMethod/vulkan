@@ -1,4 +1,5 @@
 #pragma once
+
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
@@ -26,10 +27,12 @@ private:
 	} mainDevice;
 
 	VkQueue graphicsQueue;
+	VkSurfaceKHR surface;
 
 	// Vulkan functions
 	void createInstance();
 	void createLogicalDevice();
+	void createSurface();
 
 	void getPhysicalDevice();
 

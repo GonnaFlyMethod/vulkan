@@ -6,6 +6,7 @@ int VulkanRenderer::init(GLFWwindow * newWindow) {
 
 	try {
 		createInstance();
+		createSurface();
 		getPhysicalDevice();
 		createLogicalDevice();
 	}
@@ -20,6 +21,7 @@ int VulkanRenderer::init(GLFWwindow * newWindow) {
 
 void VulkanRenderer::cleanup()
 {
+	vkDestroySurfaceKHR(instance, surface, nullptr);
 	vkDestroyDevice(mainDevice.logicalDevice, nullptr);
 	vkDestroyInstance(instance, nullptr);
 }
@@ -124,6 +126,16 @@ void VulkanRenderer::createLogicalDevice()
 	vkGetDeviceQueue(mainDevice.logicalDevice, indices.graphicsFamily, 0, &graphicsQueue);
 }
 
+void VulkanRenderer::createSurface()
+{
+	// Creating an info struct, runs the create surface function, retur
+	VkResult result = glfwCreateWindowSurface(instance, window, nullptr, &surface);
+	
+	if (result != VK_SUCCESS) {
+		throw std::runtime_error("error occurred while creating surface");
+	}
+}
+
 void VulkanRenderer::getPhysicalDevice()
 {
 	uint32_t deviceCount = 0;
@@ -207,6 +219,15 @@ QueueFamilyIndices VulkanRenderer::getQueueFamilies(VkPhysicalDevice device)
 		
 		if (queueFamily.queueCount > 0 && queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
 			indices.graphicsFamily = i;
+		}
+
+		// Check of Queue family supports presentation
+		VkBool32 presentationSupport = false;
+		vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentationSupport);
+
+		// The index of the presentation queue can be equal to the index of graphics queue
+		if (queueFamily.queueCount > 0 && presentationSupport == true) {
+			indices.presentationFamily = i;
 		}
 
 		if (indices.isValid()) {
