@@ -40,7 +40,9 @@ private:
 	void getPhysicalDevice();
 
 	bool checkInstanceExtensionsSupport(std::vector<const char*>* checkExtensions);
+	
 	bool checkDeviceSuitable(VkPhysicalDevice device);
+	bool checkDeviceExtensionSupport(VkPhysicalDevice device);
 
 	QueueFamilyIndices getQueueFamilies(VkPhysicalDevice device);
 };

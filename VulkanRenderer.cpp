@@ -114,8 +114,8 @@ void VulkanRenderer::createLogicalDevice()
 
 	//  List of queue create infos, so device can create required queues
 	deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data(); 
-	deviceCreateInfo.enabledExtensionCount = 0;  // Number of enabled logical device extensions
-	deviceCreateInfo.ppEnabledExtensionNames = nullptr; // List of enabled logical device extensions
+	deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());  // Number of enabled logical device extensions
+	deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data(); // List of enabled logical device extensions
 	
 	// Physical Device Features the Logical Device will be using
 	VkPhysicalDeviceFeatures deviceFeatures = {};
@@ -208,9 +208,37 @@ bool VulkanRenderer::checkDeviceSuitable(VkPhysicalDevice device)
 	vkGetPhysicalDeviceFeatures(device, &deviceFeatures);*/
 
 	QueueFamilyIndices indices = getQueueFamilies(device);
+	bool extensionsSupported = checkDeviceExtensionSupport(device);
 
+	return indices.isValid() && extensionsSupported;
+}
 
-	return indices.isValid();
+bool VulkanRenderer::checkDeviceExtensionSupport(VkPhysicalDevice device)
+{
+	uint32_t extensionCount = 0;
+	vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
+
+	if (extensionCount == 0) {
+		return false;
+	}
+
+	std::vector<VkExtensionProperties> extensions(extensionCount);
+	vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, extensions.data());
+
+	bool hasExtension = false;
+
+	for (const auto& deviceExtension : deviceExtensions) {
+
+		for (const auto& extension : extensions) {
+			if (strcmp(deviceExtension, extension.extensionName)) {
+				hasExtension = true;
+				
+				break;
+			}
+		}
+	}
+
+	return hasExtension;
 }
 
 QueueFamilyIndices VulkanRenderer::getQueueFamilies(VkPhysicalDevice device)
@@ -237,7 +265,7 @@ QueueFamilyIndices VulkanRenderer::getQueueFamilies(VkPhysicalDevice device)
 		vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentationSupport);
 
 		// The index of the presentation queue can be equal to the index of graphics queue
-		if (queueFamily.queueCount > 0 && presentationSupport == true) {
+		if (queueFamily.queueCount > 0 && presentationSupport) {
 			indices.presentationFamily = i;
 		}
 
