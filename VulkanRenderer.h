@@ -45,5 +45,6 @@ private:
 	bool checkDeviceExtensionSupport(VkPhysicalDevice device);
 
 	QueueFamilyIndices getQueueFamilies(VkPhysicalDevice device);
+	SwapChainDetails getSwapChainDetails(VkPhysicalDevice device);
 };
 
