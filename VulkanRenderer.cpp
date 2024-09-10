@@ -147,6 +147,17 @@ void VulkanRenderer::createSurface()
 	}
 }
 
+void VulkanRenderer::createSwapChain()
+{
+	SwapChainDetails swapChainDetails = getSwapChainDetails(mainDevice.physicalDevice);
+
+	// 1. CHOOSE BEST SURFACE FORMAT
+	// 2. CHOOSE BEST PRESENTATION MODE
+	// 3. CHOOSE SWAPCHAIN IMAGE RESOLUTION
+
+
+}
+
 void VulkanRenderer::getPhysicalDevice()
 {
 	uint32_t deviceCount = 0;
@@ -317,4 +328,27 @@ SwapChainDetails VulkanRenderer::getSwapChainDetails(VkPhysicalDevice device)
 
 
 	return swapChainDetails;
+}
+
+VkSurfaceFormatKHR VulkanRenderer::chooseBestSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& formats)
+{
+	if (formats.size() == 1 && formats[0].format == VK_FORMAT_UNDEFINED) {
+		VkSurfaceFormatKHR surfaceFormat{};
+
+		surfaceFormat.format = VK_FORMAT_R8G8B8A8_UNORM;
+		surfaceFormat.colorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
+		
+		return surfaceFormat;
+	}
+
+	for (const auto& format : formats) {
+		bool isBestFormat = format.format == VK_FORMAT_R8G8B8A8_UNORM
+			|| format.format == VK_FORMAT_B8G8R8A8_UNORM; // Backup
+
+		if (isBestFormat && format.colorSpace == VK_COLORSPACE_SRGB_NONLINEAR_KHR) {
+			return format;
+		}
+	}
+
+	return formats[0];
 }
