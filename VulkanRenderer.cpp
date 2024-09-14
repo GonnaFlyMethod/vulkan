@@ -154,8 +154,6 @@ void VulkanRenderer::createSwapChain()
 	// 1. CHOOSE BEST SURFACE FORMAT
 	// 2. CHOOSE BEST PRESENTATION MODE
 	// 3. CHOOSE SWAPCHAIN IMAGE RESOLUTION
-
-
 }
 
 void VulkanRenderer::getPhysicalDevice()
@@ -332,6 +330,8 @@ SwapChainDetails VulkanRenderer::getSwapChainDetails(VkPhysicalDevice device)
 
 VkSurfaceFormatKHR VulkanRenderer::chooseBestSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& formats)
 {
+	// VK_FORMAT_UNDEFINED means that all formats are available
+	
 	if (formats.size() == 1 && formats[0].format == VK_FORMAT_UNDEFINED) {
 		VkSurfaceFormatKHR surfaceFormat{};
 
@@ -351,4 +351,16 @@ VkSurfaceFormatKHR VulkanRenderer::chooseBestSurfaceFormat(const std::vector<VkS
 	}
 
 	return formats[0];
+}
+
+VkPresentModeKHR VulkanRenderer::chooseBestPresentationMode(const std::vector<VkPresentModeKHR> presentationModes)
+{
+	for (const auto& presentationMode : presentationModes) {
+		if (presentationMode == VK_PRESENT_MODE_MAILBOX_KHR) {
+			return presentationMode;
+		}
+	}
+
+	// Safe back up
+	return VK_PRESENT_MODE_FIFO_KHR;
 }
