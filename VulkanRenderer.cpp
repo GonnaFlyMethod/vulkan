@@ -364,3 +364,39 @@ VkPresentModeKHR VulkanRenderer::chooseBestPresentationMode(const std::vector<Vk
 	// Safe back up
 	return VK_PRESENT_MODE_FIFO_KHR;
 }
+
+VkExtent2D VulkanRenderer::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& surfaceCapabilities)
+{
+	// If the width is the max uint32_t then it's undefined and we just set the resolution of the current
+	// framebuffer from glfw
+
+	if (surfaceCapabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
+		return surfaceCapabilities.currentExtent;
+	}
+
+	int width{}, height{};
+	
+	glfwGetFramebufferSize(window, &width, &height);
+
+	VkExtent2D extent = {};
+	extent.width = static_cast<uint32_t>(width);
+	extent.height = static_cast<uint32_t>(height);
+		
+	uint32_t maxThresholdWidth = std::min(
+		surfaceCapabilities.maxImageExtent.width, extent.width);
+
+	uint32_t minThresholdWidth = std::max(
+		surfaceCapabilities.minImageExtent.width, maxThresholdWidth);
+		
+	extent.width = minThresholdWidth;
+
+	uint32_t maxThresholdHeight = std::min(
+		surfaceCapabilities.maxImageExtent.height, extent.height);
+
+	uint32_t minThresholdHeight = std::max(
+		surfaceCapabilities.minImageExtent.height, maxThresholdHeight);
+
+	extent.height = minThresholdHeight;
+
+	return extent;
+}
