@@ -22,6 +22,10 @@ int VulkanRenderer::init(GLFWwindow * newWindow) {
 
 void VulkanRenderer::cleanup()
 {
+	for (auto image : swapchainImages) {
+		vkDestroyImageView(mainDevice.logicalDevice, image.imageView, nullptr);
+	}
+
 	vkDestroySwapchainKHR(mainDevice.logicalDevice, swapchain, nullptr);
 	vkDestroySurfaceKHR(instance, surface, nullptr);
 	vkDestroyDevice(mainDevice.logicalDevice, nullptr);
@@ -210,6 +214,27 @@ void VulkanRenderer::createSwapChain()
 	
 	if (result != VK_SUCCESS) {
 		throw std::runtime_error("Failed to create swapchain");
+	}
+
+	// Store for later reference
+	swapchainImageFormat = surfaceFormat.format;
+	swapchainExtent = extent;
+
+	// Get Swap chain images
+
+	uint32_t swapchainImageCount;
+	vkGetSwapchainImagesKHR(mainDevice.logicalDevice, swapchain, &swapchainImageCount, nullptr);
+
+	std::vector<VkImage> images(swapchainImageCount);
+
+	vkGetSwapchainImagesKHR(mainDevice.logicalDevice, swapchain, &swapchainImageCount, images.data());
+
+	for (VkImage image : images) {
+		SwapchainImage swapchainImage = {};
+		swapchainImage.image = image;
+		swapchainImage.imageView = createImageView(image, swapchainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT);
+		
+		swapchainImages.push_back(swapchainImage);
 	}
 }
 
@@ -456,4 +481,35 @@ VkExtent2D VulkanRenderer::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& surf
 	extent.height = minThresholdHeight;
 
 	return extent;
+}
+
+VkImageView VulkanRenderer::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags)
+{
+	VkImageViewCreateInfo viewCreateInfo = {};
+	viewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+	viewCreateInfo.image = image;									// Image to create view for
+	viewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;				// Type of image (1D, 2D, 3D etc...)
+	viewCreateInfo.format = format;									// Format of iamge data
+	viewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;	// Allows remapping of RGBA components to other rgba values
+	viewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+	viewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+	viewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+
+	// Subresources allow the view to view only a prt of an image
+	viewCreateInfo.subresourceRange.aspectMask = aspectFlags;		// Which aspect of image to view( e.g. COLOR_BIT for viewing color)
+	viewCreateInfo.subresourceRange.baseMipLevel = 0;				// Start mipmap level to view from
+	viewCreateInfo.subresourceRange.levelCount = 1;					// Number of mipmap levels to view
+	viewCreateInfo.subresourceRange.baseArrayLayer = 0;				// Start array level to view from
+	viewCreateInfo.subresourceRange.layerCount = 1;					// Number of array levels to view
+
+	VkImageView imageView;
+
+	VkResult result = vkCreateImageView(mainDevice.logicalDevice, &viewCreateInfo, nullptr, &imageView);
+
+	if (result != VK_SUCCESS) {
+		throw std::runtime_error("error occurred while creating image view");
+	}
+
+
+	return imageView;
 }

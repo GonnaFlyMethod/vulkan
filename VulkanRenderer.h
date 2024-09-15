@@ -23,6 +23,9 @@ private:
 	// Vulkan Components
 	VkInstance instance;
 
+	// Vulkan compinents
+	
+	// Main
 	struct {
 		VkPhysicalDevice physicalDevice;
 		VkDevice logicalDevice;
@@ -35,8 +38,15 @@ private:
 
 	VkSwapchainKHR swapchain;
 
+	std::vector<SwapchainImage> swapchainImages;
+
+	// Utility
+	VkFormat swapchainImageFormat;
+	VkExtent2D swapchainExtent;
+
 	// Vulkan functions
 	void createInstance();
+	void createDebugCallback();
 	void createLogicalDevice();
 	void createSurface();
 	void createSwapChain();
@@ -54,5 +64,7 @@ private:
 	VkSurfaceFormatKHR chooseBestSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &formats);
 	VkPresentModeKHR chooseBestPresentationMode(const std::vector<VkPresentModeKHR> presentationModes);
 	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& surfaceCapabilities);
+
+	VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
 };
 
