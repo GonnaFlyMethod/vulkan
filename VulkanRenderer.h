@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <vector>
 #include <set>
+#include <algorithm>
 
 #include "Utilities.h"
 
@@ -32,6 +33,8 @@ private:
 
 	VkSurfaceKHR surface;
 
+	VkSwapchainKHR swapchain;
+
 	// Vulkan functions
 	void createInstance();
 	void createLogicalDevice();
@@ -49,5 +52,7 @@ private:
 	SwapChainDetails getSwapChainDetails(VkPhysicalDevice device);
 
 	VkSurfaceFormatKHR chooseBestSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &formats);
+	VkPresentModeKHR chooseBestPresentationMode(const std::vector<VkPresentModeKHR> presentationModes);
+	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& surfaceCapabilities);
 };
 

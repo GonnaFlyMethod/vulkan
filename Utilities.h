@@ -17,6 +17,6 @@ struct QueueFamilyIndices {
 
 struct SwapChainDetails {
 	VkSurfaceCapabilitiesKHR surfaceCapabilities;  // Surface proporties
-	std::vector<VkSurfaceFormatKHR> formats; // Image formats, e.g. RGBA and size of each color
+	std::vector<VkSurfaceFormatKHR> formats; // Image formats, e.g. RGBA and size of each color in bits
 	std::vector<VkPresentModeKHR> presentationModes;  // How images should be presented to the screen
 };
