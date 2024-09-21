@@ -34,3 +34,6 @@
 # Custom
 .vs
 x64
+
+# Shaders
+Shaders/compile_shaders.bat
