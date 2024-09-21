@@ -269,6 +269,51 @@ void VulkanRenderer::createGraphicsPipeline()
 	};
 
 	// Creating pipeline
+	
+	// -- VERTEX INPUT --
+	VkPipelineVertexInputStateCreateInfo vertexInputCreateInfo = {};
+	vertexInputCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+	vertexInputCreateInfo.vertexBindingDescriptionCount = 0;
+	vertexInputCreateInfo.pVertexBindingDescriptions = nullptr;		// List of Vertex binding descriptions (data spacing / stride info)
+	vertexInputCreateInfo.vertexAttributeDescriptionCount = 0;
+	vertexInputCreateInfo.pVertexAttributeDescriptions = nullptr;	// List of vertex attribute descriptions (data format and where to bind to / from)
+
+	// -- INPPUT ASSEMBLY
+	VkPipelineInputAssemblyStateCreateInfo inputAssembly = {};
+	inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+	inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;		// Primitive type to assemble vertices as
+	inputAssembly.primitiveRestartEnable = VK_FALSE;					// Allow overriding of "strip" topology to start new primitives
+
+	// -- VIEWPORT & SCISSOR --
+	
+	// Create a viewport info struct
+	VkViewport viewport = {};
+	viewport.x = 0.0f;									// x start coordinate of viewport
+	viewport.y = 0.0f;									// y start coordinate of viewport
+	viewport.width = (float)swapchainExtent.width;		// width of viewport
+	viewport.height = (float)swapchainExtent.height;	// width of viewport
+	viewport.minDepth = 0.0f;							// min framebuffer depth
+	viewport.maxDepth = 1.0f;							// max framebuffer depth
+
+	// Create a scissor info struct
+	VkRect2D scissor = {};
+	scissor.offset = { 0,0 };							// Offset to use region from
+	scissor.extent = swapchainExtent;					// Extent to describe region to use, starting at offset
+
+	VkPipelineViewportStateCreateInfo viewportStateCreateInfo = {};
+	viewportStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+	viewportStateCreateInfo.viewportCount = 1;
+	viewportStateCreateInfo.pViewports = &viewport;
+	viewportStateCreateInfo.scissorCount = 1;
+	viewportStateCreateInfo.pScissors = &scissor;
+
+	// -- DYNAMIC STATES --
+	// Dynamic states to enable
+	std::vector<VkDynamicState> dynamicStateEnables;
+	dynamicStateEnables.push_back(VK_DYNAMIC_STATE_VIEWPORT);		// Dynamic viewport: we can resize in command buffer with vkCmdSetViewport(commandBuffer, 0, 1&viewport)
+	dynamicStateEnables.push_back(VK_DYNAMIC_STATE_SCISSOR);		// Dynamic scissor : we can resize in command buffer with vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+
+	// Dynamic state creation info
 
 
 	// Destroy shader modules, no longer needed after pipeline created
