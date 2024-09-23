@@ -7,6 +7,7 @@
 #include <vector>
 #include <set>
 #include <algorithm>
+#include <array>
 
 #include "Utilities.h"
 
@@ -41,7 +42,10 @@ private:
 	std::vector<SwapchainImage> swapchainImages;
 
 	// - Pipeline
+
+	VkPipeline graphicsPipeline;
 	VkPipelineLayout pipelineLayout;
+	VkRenderPass renderPass;
 
 	// Utility
 	VkFormat swapchainImageFormat;
@@ -55,7 +59,6 @@ private:
 	void createSwapChain();
 	void createRenderPass();
 	void createGraphicsPipeline();
-
 	void getPhysicalDevice();
 
 	bool checkInstanceExtensionsSupport(std::vector<const char*>* checkExtensions);
