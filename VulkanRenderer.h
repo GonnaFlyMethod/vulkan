@@ -40,6 +40,9 @@ private:
 
 	std::vector<SwapchainImage> swapchainImages;
 
+	// - Pipeline
+	VkPipelineLayout pipelineLayout;
+
 	// Utility
 	VkFormat swapchainImageFormat;
 	VkExtent2D swapchainExtent;
@@ -50,6 +53,7 @@ private:
 	void createLogicalDevice();
 	void createSurface();
 	void createSwapChain();
+	void createRenderPass();
 	void createGraphicsPipeline();
 
 	void getPhysicalDevice();

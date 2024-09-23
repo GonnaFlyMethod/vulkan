@@ -10,6 +10,7 @@ int VulkanRenderer::init(GLFWwindow * newWindow) {
 		getPhysicalDevice();
 		createLogicalDevice();
 		createSwapChain();
+		createRenderPass();
 		createGraphicsPipeline();
 	}
 	catch(const std::runtime_error &e){
@@ -23,6 +24,8 @@ int VulkanRenderer::init(GLFWwindow * newWindow) {
 
 void VulkanRenderer::cleanup()
 {
+	vkDestroyPipelineLayout(mainDevice.logicalDevice, pipelineLayout, nullptr);
+
 	for (auto image : swapchainImages) {
 		vkDestroyImageView(mainDevice.logicalDevice, image.imageView, nullptr);
 	}
@@ -239,6 +242,12 @@ void VulkanRenderer::createSwapChain()
 	}
 }
 
+void VulkanRenderer::createRenderPass()
+{
+	VkRenderPassCreateInfo renderPassCreateInfo = {};
+	renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+}
+
 void VulkanRenderer::createGraphicsPipeline()
 {
 	// Read in SPIR-V code of shaders
@@ -314,6 +323,77 @@ void VulkanRenderer::createGraphicsPipeline()
 	dynamicStateEnables.push_back(VK_DYNAMIC_STATE_SCISSOR);		// Dynamic scissor : we can resize in command buffer with vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
 	// Dynamic state creation info
+	VkPipelineDynamicStateCreateInfo dynamicStateCreateInfo = {};
+	dynamicStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+	dynamicStateCreateInfo.dynamicStateCount = static_cast<uint32_t>(dynamicStateEnables.size());
+	dynamicStateCreateInfo.pDynamicStates = dynamicStateEnables.data();
+
+	// -- RASTERIZER --
+	VkPipelineRasterizationStateCreateInfo  rasterizerCreateInfo = {};
+	rasterizerCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+	rasterizerCreateInfo.depthClampEnable = VK_FALSE;				// Change if fragments beyond near/far planes are clipped (default)
+	rasterizerCreateInfo.rasterizerDiscardEnable = VK_FALSE;		// Skipping rasterization (suitable for pipeline without framebuffer)
+	rasterizerCreateInfo.polygonMode = VK_POLYGON_MODE_FILL;		// How to handle filling points between vertices
+	rasterizerCreateInfo.lineWidth = 1.0f;							// How thick lines should be when drawn
+	rasterizerCreateInfo.cullMode = VK_CULL_MODE_BACK_BIT;			// Which face of a trinagle to cull
+	rasterizerCreateInfo.frontFace = VK_FRONT_FACE_CLOCKWISE;		// Winding to determine which side is front
+	rasterizerCreateInfo.depthBiasEnable = VK_FALSE;				// Whether to add depth bias to fragmetns  (good for stopping "shadow acne")
+
+	// -- MULTISAMPLING --
+	VkPipelineMultisampleStateCreateInfo multisamplingCreateInfo = {};
+	multisamplingCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+	multisamplingCreateInfo.sampleShadingEnable = VK_FALSE;										// Enable multisample shading or not
+	multisamplingCreateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;						// Number of samples to use per fragment
+
+	// -- BLENDING --
+
+	// Blend attachment state (how blending is handled)
+	VkPipelineColorBlendAttachmentState colorState = {};
+	colorState.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT;		// Colors to apply blending to
+	colorState.blendEnable = VK_TRUE;																				// Enable blending
+
+	// Blending equation uses: (srcColorBlendFactor * newColor) + (dstColorBlendFactor * oldColor)
+	colorState.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+	colorState.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+	colorState.colorBlendOp = VK_BLEND_OP_ADD;
+
+	// (VK_BLEND_FACTOR_SRC_ALPHA * newColor) + (VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA * oldColor)
+	// (newColorAlpha * newColor) + ((1 - newColorAlpha) * oldColor)
+
+	colorState.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+	colorState.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+	colorState.alphaBlendOp = VK_BLEND_OP_ADD;
+
+	//	Summarised: (1 * newAlpha) + (0 * oldAlpha)
+
+
+	VkPipelineColorBlendStateCreateInfo colorBlendingCreateInfo = {};
+	colorBlendingCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+	colorBlendingCreateInfo.logicOpEnable = VK_FALSE;			// Alternative to calculatons is to use logic operations
+	colorBlendingCreateInfo.attachmentCount = 1;
+	colorBlendingCreateInfo.pAttachments = &colorState;
+
+	// -- PIPELINE LAYOUT (TODO: apply future descriptor set layouts) --
+	VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = {};
+	pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO;
+	pipelineLayoutCreateInfo.setLayoutCount = 0;
+	pipelineLayoutCreateInfo.pushConstantRangeCount = 0;
+	pipelineLayoutCreateInfo.pPushConstantRanges = nullptr;
+
+	VkResult result = vkCreatePipelineLayout(
+		mainDevice.logicalDevice, &pipelineLayoutCreateInfo, nullptr, &pipelineLayout);
+
+	// -- DEPTH STENCIL TESTING --
+
+
+
+
+	//
+
+	if (result != VK_SUCCESS) {
+		throw std::runtime_error("error occurred while creating pipeline layout");
+	}
+
 
 
 	// Destroy shader modules, no longer needed after pipeline created
