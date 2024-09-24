@@ -49,7 +49,10 @@ private:
 	VkPipelineLayout pipelineLayout;
 	VkRenderPass renderPass;
 
-	// Utility
+	// - Pools
+	VkCommandPool graphicsCommandPool;
+
+	// - Utility
 	VkFormat swapchainImageFormat;
 	VkExtent2D swapchainExtent;
 
@@ -62,6 +65,8 @@ private:
 	void createRenderPass();
 	void createGraphicsPipeline();
 	void createFramebuffers();
+	void createCommandPool();
+
 	void getPhysicalDevice();
 
 	bool checkInstanceExtensionsSupport(std::vector<const char*>* checkExtensions);

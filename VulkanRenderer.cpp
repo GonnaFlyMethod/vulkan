@@ -534,6 +534,24 @@ void VulkanRenderer::createFramebuffers()
 	}
 }
 
+void VulkanRenderer::createCommandPool()
+{
+	// Get indices of queue families from device
+	QueueFamilyIndices queueFamilyIndices = getQueueFamilies(mainDevice.physicalDevice);
+
+	VkCommandPoolCreateInfo poolInfo = {};
+
+	poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+	poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily;	// Command pool will use this graphics family index for commands
+
+	VkResult result = vkCreateCommandPool(mainDevice.logicalDevice, &poolInfo, nullptr, &graphicsCommandPool);
+
+	if (result != VK_SUCCESS) {
+		throw std::runtime_error("error occurred while creating graphics command pool");
+	}
+
+}
+
 void VulkanRenderer::getPhysicalDevice()
 {
 	uint32_t deviceCount = 0;
