@@ -578,6 +578,50 @@ void VulkanRenderer::createCommandBuffers()
 
 
 }
+void VulkanRenderer::recordCommands()
+{
+	// Information about how to begin each command buffer
+	VkCommandBufferBeginInfo bufferBeginInfo = { };
+	bufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	bufferBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;		// Buffer can be resubmitted when it has already been submitted and is awaiting execution
+
+	// Information about how to begin a render pass (only needed for graphical application)
+	VkRenderPassBeginInfo renderPassBeginInfo = {};
+	renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+	renderPassBeginInfo.renderPass = renderPass;								// Render pass to begin
+	renderPassBeginInfo.renderArea.offset = { 0,0 };							// Start point of render pass in pix
+	renderPassBeginInfo.renderArea.extent = swapchainExtent;					// Size of region to run render pass on (starting at offset)
+	
+	VkClearValue clearValues[] = {
+		{0.6f, 0.65f, 0.4f, 1.0f}
+	};
+	renderPassBeginInfo.pClearValues = clearValues;								// List of clear values (TODO: depth attachment clear value)
+	renderPassBeginInfo.clearValueCount = 1;
+
+	for (size_t i = 0; i < commandBuffers.size(); i++) {
+		renderPassBeginInfo.framebuffer = swapchainFrameBuffers[i];
+
+		
+		// Start recording commands to command buffer
+		VkResult result = vkBeginCommandBuffer(commandBuffers[i], &bufferBeginInfo);
+		if (result != VK_SUCCESS) {
+			throw std::runtime_error("error occurred when setting up command buffer");
+		}
+
+		vkCmdBeginRenderPass(commandBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+		vkCmdEndRenderPass(commandBuffers[i]);
+
+		result = vkEndCommandBuffer(commandBuffers[i]);
+		if (result != VK_SUCCESS) {
+			throw std::runtime_error("error occurred when ending command buffer");
+		}
+	}
+
+
+
+
+}
 void VulkanRenderer::getPhysicalDevice()
 {
 	uint32_t deviceCount = 0;
