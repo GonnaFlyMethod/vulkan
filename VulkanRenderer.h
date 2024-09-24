@@ -40,8 +40,8 @@ private:
 	VkSwapchainKHR swapchain;
 
 	std::vector<SwapchainImage> swapchainImages;
-
 	std::vector<VkFramebuffer> swapchainFrameBuffers;
+	std::vector<VkCommandBuffer> commandBuffers;
 
 	// - Pipeline
 
@@ -66,6 +66,7 @@ private:
 	void createGraphicsPipeline();
 	void createFramebuffers();
 	void createCommandPool();
+	void createCommandBuffers();
 
 	void getPhysicalDevice();
 

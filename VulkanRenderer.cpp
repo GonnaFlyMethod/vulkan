@@ -24,6 +24,8 @@ int VulkanRenderer::init(GLFWwindow * newWindow) {
 
 void VulkanRenderer::cleanup()
 {
+	vkDestroyCommandPool(mainDevice.logicalDevice, graphicsCommandPool, nullptr);
+
 	for (auto framebuffer : swapchainFrameBuffers) {
 		vkDestroyFramebuffer(mainDevice.logicalDevice, framebuffer, nullptr);
 	}
@@ -510,7 +512,7 @@ void VulkanRenderer::createGraphicsPipeline()
 
 void VulkanRenderer::createFramebuffers()
 {
-	swapchainFrameBuffers.reserve(swapchainImages.size());
+	swapchainFrameBuffers.resize(swapchainImages.size());
 
 	for (size_t i = 0; i < swapchainFrameBuffers.size(); i++) {
 		std::array<VkImageView, 1> attachments = {swapchainImages[i].imageView};
@@ -552,6 +554,30 @@ void VulkanRenderer::createCommandPool()
 
 }
 
+void VulkanRenderer::createCommandBuffers()
+{
+	commandBuffers.resize(swapchainFrameBuffers.size());
+
+	VkCommandBufferAllocateInfo commandBufferAllocInfo = {};
+
+	commandBufferAllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	commandBufferAllocInfo.commandPool = graphicsCommandPool;
+	commandBufferAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;	// VK_COMMAND_BUFFER_LEVEL_PRIMARY - Commands are executed by queue directly
+																	// VK_COMMAND_BUFFER_LEVEL_SECONDARY - command buffer is not called directly by queue, 
+																	//	but rather called from other buffers via "vkCmdExecuteCommands" when recording commands in primary buffer
+	commandBufferAllocInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
+
+	// Allocate command buffers and place handles in array of buffers
+	VkResult result = vkAllocateCommandBuffers(
+		mainDevice.logicalDevice, &commandBufferAllocInfo, commandBuffers.data());
+
+	if (result != VK_SUCCESS) {
+		throw std::runtime_error("error occured when allocating command buffers");
+	}
+
+
+
+}
 void VulkanRenderer::getPhysicalDevice()
 {
 	uint32_t deviceCount = 0;
