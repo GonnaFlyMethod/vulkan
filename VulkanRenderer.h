@@ -41,6 +41,8 @@ private:
 
 	std::vector<SwapchainImage> swapchainImages;
 
+	std::vector<VkFramebuffer> swapchainFrameBuffers;
+
 	// - Pipeline
 
 	VkPipeline graphicsPipeline;
@@ -59,6 +61,7 @@ private:
 	void createSwapChain();
 	void createRenderPass();
 	void createGraphicsPipeline();
+	void createFramebuffers();
 	void getPhysicalDevice();
 
 	bool checkInstanceExtensionsSupport(std::vector<const char*>* checkExtensions);

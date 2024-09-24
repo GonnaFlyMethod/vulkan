@@ -24,6 +24,10 @@ int VulkanRenderer::init(GLFWwindow * newWindow) {
 
 void VulkanRenderer::cleanup()
 {
+	for (auto framebuffer : swapchainFrameBuffers) {
+		vkDestroyFramebuffer(mainDevice.logicalDevice, framebuffer, nullptr);
+	}
+
 	vkDestroyPipeline(mainDevice.logicalDevice, graphicsPipeline, nullptr);
 
 	vkDestroyPipelineLayout(mainDevice.logicalDevice, pipelineLayout, nullptr);
@@ -502,6 +506,32 @@ void VulkanRenderer::createGraphicsPipeline()
 	// Destroy Shader Modules, no longer needed after Pipeline created
 	vkDestroyShaderModule(mainDevice.logicalDevice, fragmentShaderModule, nullptr);
 	vkDestroyShaderModule(mainDevice.logicalDevice, vertexShaderModule, nullptr);
+}
+
+void VulkanRenderer::createFramebuffers()
+{
+	swapchainFrameBuffers.reserve(swapchainImages.size());
+
+	for (size_t i = 0; i < swapchainFrameBuffers.size(); i++) {
+		std::array<VkImageView, 1> attachments = {swapchainImages[i].imageView};
+
+
+		VkFramebufferCreateInfo framebufferCreateInfo = {};
+		framebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+		framebufferCreateInfo.renderPass = renderPass;											// Render pass layout the framebuffer will be used with
+		framebufferCreateInfo.attachmentCount = static_cast<uint32_t>(attachments.size());		// List of attachments (1:1 with render pass)
+		framebufferCreateInfo.pAttachments = attachments.data();
+		framebufferCreateInfo.width = swapchainExtent.width;									// Framebuffer width
+		framebufferCreateInfo.height = swapchainExtent.height;									// Framebuffer height
+		framebufferCreateInfo.layers = 1;														// Framebuffer layers
+		
+		VkResult result = vkCreateFramebuffer(
+			mainDevice.logicalDevice, &framebufferCreateInfo, nullptr, &swapchainFrameBuffers[i]);
+
+		if (result != VK_SUCCESS) {
+			throw std::runtime_error("error occurred while creating framebuffer");
+		}
+	}
 }
 
 void VulkanRenderer::getPhysicalDevice()
