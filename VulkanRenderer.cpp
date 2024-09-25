@@ -16,6 +16,7 @@ int VulkanRenderer::init(GLFWwindow * newWindow) {
 		createCommandPool();
 		createCommandBuffers();
 		recordCommands();
+		createSynchronisation();
 	}
 	catch(const std::runtime_error &e){
 		printf("ERROR: %s\n", e.what());
@@ -26,8 +27,64 @@ int VulkanRenderer::init(GLFWwindow * newWindow) {
 	return EXIT_SUCCESS;
 }
 
+void VulkanRenderer::draw()
+{
+	// 1. Get next available image to draw to and set something to signal when we're finished with the image (a semaphore)
+	// Get index of next image to be drawn to, and signal semaphore when ready to be drawn to
+	uint32_t imageIndex;
+	
+	vkAcquireNextImageKHR(
+		mainDevice.logicalDevice, 
+		swapchain, 
+		std::numeric_limits<uint64_t>::max(), 
+		imageAvailable, VK_NULL_HANDLE, &imageIndex);
+
+	// -- SUBMIT COMMAND BUFFER TO RENDER -- 
+	// Queue submission information
+	VkSubmitInfo submitInfo = {};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.waitSemaphoreCount = 1;							// Number of semaphores to wait on
+	submitInfo.pWaitSemaphores = &imageAvailable;				// List of semaphores to wait on
+	
+	VkPipelineStageFlags waitStage[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+	submitInfo.pWaitDstStageMask = waitStage;
+	submitInfo.commandBufferCount = 1;							// Number of command buffers to submit
+	submitInfo.pCommandBuffers = &commandBuffers[imageIndex];	// Command buffer to submit
+	submitInfo.signalSemaphoreCount = 1;						// Number of semaphores to signal
+	submitInfo.pSignalSemaphores = &renderFinished;				// Semaphore to signal when command buffer finishes
+
+	// Submitting command buffer to queue
+	VkResult result = vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+
+	if (result != VK_SUCCESS) {
+		throw std::runtime_error("error occurred while submitting command buffer to queue");
+	}
+
+	// -- PRESENT RENDERED IMAGE TO SCREEN
+	VkPresentInfoKHR presentInfo = {};
+	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+	presentInfo.waitSemaphoreCount = 1;							// Number of semaphores to wait on
+	presentInfo.pWaitSemaphores = &renderFinished;				// Semaphores to wait on
+	presentInfo.swapchainCount = 1;								// Number of swapchains to present to
+	presentInfo.pSwapchains = &swapchain;						// Swapchains to present images to
+	presentInfo.pImageIndices = &imageIndex;					// Index of images in swapchains to present
+
+	result = vkQueuePresentKHR(presentationQueue, &presentInfo);
+
+	if (result != VK_SUCCESS) {
+		throw std::runtime_error("error occurred while presenting an image");
+	}
+
+	// 2. Submit command buffer to queue for execution, making sure it waits for the image to be signaled as avaiable for drawing
+	// and signals when it has finished rendering
+	// 3. Present image to screen when it has signalled finished rendering
+}
+
 void VulkanRenderer::cleanup()
 {
+	vkDestroySemaphore(mainDevice.logicalDevice, renderFinished, nullptr);
+	vkDestroySemaphore(mainDevice.logicalDevice, imageAvailable, nullptr);
+
 	vkDestroyCommandPool(mainDevice.logicalDevice, graphicsCommandPool, nullptr);
 
 	for (auto framebuffer : swapchainFrameBuffers) {
@@ -579,6 +636,20 @@ void VulkanRenderer::createCommandBuffers()
 		throw std::runtime_error("error occured when allocating command buffers");
 	}
 }
+void VulkanRenderer::createSynchronisation()
+{
+	VkSemaphoreCreateInfo semaphoreCreateInfo = {};
+	semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+	VkResult result = vkCreateSemaphore(mainDevice.logicalDevice, &semaphoreCreateInfo, nullptr, &imageAvailable);
+	VkResult result1 = vkCreateSemaphore(
+		mainDevice.logicalDevice, &semaphoreCreateInfo, nullptr, &renderFinished);
+
+	if (result != VK_SUCCESS || result1 != VK_SUCCESS) {
+		throw std::runtime_error("error occurred when creating a semaphore!");
+	}
+
+}
 void VulkanRenderer::recordCommands()
 {
 	// Information about how to begin each command buffer
@@ -594,7 +665,7 @@ void VulkanRenderer::recordCommands()
 	renderPassBeginInfo.renderArea.extent = swapchainExtent;					// Size of region to run render pass on (starting at offset)
 	
 	VkClearValue clearValues[] = {
-		{0.6f, 0.65f, 0.4f, 1.0f}
+		{0.3f, 0.4f, 0.7f, 1.0f}
 	};
 	renderPassBeginInfo.pClearValues = clearValues;								// List of clear values (TODO: depth attachment clear value)
 	renderPassBeginInfo.clearValueCount = 1;
