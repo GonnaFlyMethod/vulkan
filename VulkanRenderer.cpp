@@ -37,21 +37,24 @@ void VulkanRenderer::draw()
 		mainDevice.logicalDevice, 
 		swapchain, 
 		std::numeric_limits<uint64_t>::max(), 
-		imageAvailable, VK_NULL_HANDLE, &imageIndex);
+		imageAvailable[currentFrame], VK_NULL_HANDLE, &imageIndex);
 
+	// 2. Submit command buffer to queue for execution, making sure it waits for the image to be signaled as avaiable for drawing
+
+	// and signals when it has finished rendering
 	// -- SUBMIT COMMAND BUFFER TO RENDER -- 
 	// Queue submission information
 	VkSubmitInfo submitInfo = {};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 	submitInfo.waitSemaphoreCount = 1;							// Number of semaphores to wait on
-	submitInfo.pWaitSemaphores = &imageAvailable;				// List of semaphores to wait on
+	submitInfo.pWaitSemaphores = &imageAvailable[currentFrame];				// List of semaphores to wait on
 	
 	VkPipelineStageFlags waitStage[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
 	submitInfo.pWaitDstStageMask = waitStage;
 	submitInfo.commandBufferCount = 1;							// Number of command buffers to submit
 	submitInfo.pCommandBuffers = &commandBuffers[imageIndex];	// Command buffer to submit
 	submitInfo.signalSemaphoreCount = 1;						// Number of semaphores to signal
-	submitInfo.pSignalSemaphores = &renderFinished;				// Semaphore to signal when command buffer finishes
+	submitInfo.pSignalSemaphores = &renderFinished[currentFrame];				// Semaphore to signal when command buffer finishes
 
 	// Submitting command buffer to queue
 	VkResult result = vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
@@ -60,11 +63,13 @@ void VulkanRenderer::draw()
 		throw std::runtime_error("error occurred while submitting command buffer to queue");
 	}
 
+	// 3. Present image to screen when it has signalled finished rendering
+
 	// -- PRESENT RENDERED IMAGE TO SCREEN
 	VkPresentInfoKHR presentInfo = {};
 	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 	presentInfo.waitSemaphoreCount = 1;							// Number of semaphores to wait on
-	presentInfo.pWaitSemaphores = &renderFinished;				// Semaphores to wait on
+	presentInfo.pWaitSemaphores = &renderFinished[currentFrame];				// Semaphores to wait on
 	presentInfo.swapchainCount = 1;								// Number of swapchains to present to
 	presentInfo.pSwapchains = &swapchain;						// Swapchains to present images to
 	presentInfo.pImageIndices = &imageIndex;					// Index of images in swapchains to present
@@ -75,9 +80,7 @@ void VulkanRenderer::draw()
 		throw std::runtime_error("error occurred while presenting an image");
 	}
 
-	// 2. Submit command buffer to queue for execution, making sure it waits for the image to be signaled as avaiable for drawing
-	// and signals when it has finished rendering
-	// 3. Present image to screen when it has signalled finished rendering
+	currentFrame = (currentFrame + 1) % MAX_FRAME_DRAWS;
 }
 
 void VulkanRenderer::cleanup()
@@ -85,8 +88,10 @@ void VulkanRenderer::cleanup()
 	// Wait until no actions being run on device before destroying
 	vkDeviceWaitIdle(mainDevice.logicalDevice);
 
-	vkDestroySemaphore(mainDevice.logicalDevice, renderFinished, nullptr);
-	vkDestroySemaphore(mainDevice.logicalDevice, imageAvailable, nullptr);
+	for (size_t i = 0; i < MAX_FRAME_DRAWS;i++) {
+		vkDestroySemaphore(mainDevice.logicalDevice, renderFinished[i], nullptr);
+		vkDestroySemaphore(mainDevice.logicalDevice, imageAvailable[i], nullptr);
+	}
 
 	vkDestroyCommandPool(mainDevice.logicalDevice, graphicsCommandPool, nullptr);
 
@@ -641,16 +646,23 @@ void VulkanRenderer::createCommandBuffers()
 }
 void VulkanRenderer::createSynchronisation()
 {
+	imageAvailable.resize(MAX_FRAME_DRAWS);
+	renderFinished.resize(MAX_FRAME_DRAWS);
+
 	VkSemaphoreCreateInfo semaphoreCreateInfo = {};
 	semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
-	VkResult result = vkCreateSemaphore(mainDevice.logicalDevice, &semaphoreCreateInfo, nullptr, &imageAvailable);
-	VkResult result1 = vkCreateSemaphore(
-		mainDevice.logicalDevice, &semaphoreCreateInfo, nullptr, &renderFinished);
+	for (size_t i = 0; i < MAX_FRAME_DRAWS; i++) {
+		VkResult result = vkCreateSemaphore(mainDevice.logicalDevice, &semaphoreCreateInfo, nullptr, &imageAvailable[i]);
+		VkResult result1 = vkCreateSemaphore(
+			mainDevice.logicalDevice, &semaphoreCreateInfo, nullptr, &renderFinished[i]);
 
-	if (result != VK_SUCCESS || result1 != VK_SUCCESS) {
-		throw std::runtime_error("error occurred when creating a semaphore!");
+		if (result != VK_SUCCESS || result1 != VK_SUCCESS) {
+			throw std::runtime_error("error occurred when creating a semaphore!");
+		}
 	}
+
+	
 
 }
 void VulkanRenderer::recordCommands()
@@ -695,10 +707,6 @@ void VulkanRenderer::recordCommands()
 			throw std::runtime_error("error occurred when ending command buffer");
 		}
 	}
-
-
-
-
 }
 void VulkanRenderer::getPhysicalDevice()
 {
