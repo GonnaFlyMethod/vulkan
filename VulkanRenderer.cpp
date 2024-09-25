@@ -12,6 +12,10 @@ int VulkanRenderer::init(GLFWwindow * newWindow) {
 		createSwapChain();
 		createRenderPass();
 		createGraphicsPipeline();
+		createFramebuffers();
+		createCommandPool();
+		createCommandBuffers();
+		recordCommands();
 	}
 	catch(const std::runtime_error &e){
 		printf("ERROR: %s\n", e.what());
@@ -574,9 +578,6 @@ void VulkanRenderer::createCommandBuffers()
 	if (result != VK_SUCCESS) {
 		throw std::runtime_error("error occured when allocating command buffers");
 	}
-
-
-
 }
 void VulkanRenderer::recordCommands()
 {
@@ -600,7 +601,6 @@ void VulkanRenderer::recordCommands()
 
 	for (size_t i = 0; i < commandBuffers.size(); i++) {
 		renderPassBeginInfo.framebuffer = swapchainFrameBuffers[i];
-
 		
 		// Start recording commands to command buffer
 		VkResult result = vkBeginCommandBuffer(commandBuffers[i], &bufferBeginInfo);
@@ -609,7 +609,11 @@ void VulkanRenderer::recordCommands()
 		}
 
 		vkCmdBeginRenderPass(commandBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+		 
+		vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 
+		vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
+			
 		vkCmdEndRenderPass(commandBuffers[i]);
 
 		result = vkEndCommandBuffer(commandBuffers[i]);
