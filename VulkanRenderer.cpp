@@ -12,13 +12,38 @@ int VulkanRenderer::init(GLFWwindow * newWindow) {
 
 		// Creating mesh
 		std::vector<Vertex> meshVertices = {
-			{{-0.4, -0.4, 0.0}},
-			{{0.4, -0.4, 0.0}},
-			{{0.4, 0.4, 0.0}},
+			
+			// 1st triangle
+			{
+				{-0.4, -0.4, 0.0},	// Vertex position 
+				{0.0, 0.0, 1.0}		// Vertex color
+			},	
+			
+			{
+				{0.4, -0.4, 0.0},	// Vertex position
+				{1.0, 0.0, 0.0}		// Vertex color
+			},
+			
+			{
+				{0.4, 0.4, 0.0},	// Vertex position
+				{1.0, 0.0, 0.0}		// Vertex color
+			},
 
-			{{0.4, 0.4, 0.0}},
-			{{-0.4, 0.4, 0.0}},
-			{{-0.4, -0.4, 0.0}},
+			// 2nd triangle
+			{
+				{0.4, 0.4, 0.0},	// Vertex position
+				{1.0, 0.0, 0.0}		// Vertex color
+			},
+
+			{
+				{-0.4, 0.4, 0.0},	// Vertex position
+				{0.0, 0.0, 1.0}		// Vertex color
+			},
+
+			{
+				{-0.4, -0.4, 0.0},	// Vertex position
+				{0.0, 0.0, 1.0}		// Vertex color
+			},
 
 		};
 		
@@ -463,7 +488,7 @@ void VulkanRenderer::createGraphicsPipeline()
 																		// VK_VERTEX_INPUT_RATE_VERTEX		: Move on to the next vertex
 																		// VK_VERTEX_INPUT_RATE_INSTANCE	: Move to a vertex for the next instance
 	// How the data for an attribe us defined within a vertex
-	std::array<VkVertexInputAttributeDescription, 1> attributeDescriptions;
+	std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions;
 
 	// Position attribute
 	attributeDescriptions[0].binding = 0;								// Which binding the data is at (should be same as above)
@@ -471,6 +496,12 @@ void VulkanRenderer::createGraphicsPipeline()
 	attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;		// Format the data will take (also helps define size of data)
 	attributeDescriptions[0].offset = offsetof(Vertex, pos);			// Where this attribute is defined in the data for a single vertex
 
+	// Color attribute
+	attributeDescriptions[1].binding = 0;								
+	attributeDescriptions[1].location = 1;
+	attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+	attributeDescriptions[1].offset = offsetof(Vertex, col);
+	
 	// -- VERTEX INPUT --
 	VkPipelineVertexInputStateCreateInfo vertexInputCreateInfo = {};
 	vertexInputCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -631,7 +662,6 @@ void VulkanRenderer::createFramebuffers()
 	for (size_t i = 0; i < swapchainFrameBuffers.size(); i++) {
 		std::array<VkImageView, 1> attachments = {swapchainImages[i].imageView};
 
-
 		VkFramebufferCreateInfo framebufferCreateInfo = {};
 		framebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 		framebufferCreateInfo.renderPass = renderPass;											// Render pass layout the framebuffer will be used with
@@ -732,7 +762,7 @@ void VulkanRenderer::recordCommands()
 	renderPassBeginInfo.renderArea.extent = swapchainExtent;					// Size of region to run render pass on (starting at offset)
 	
 	VkClearValue clearValues[] = {
-		{0.3f, 0.4f, 0.7f, 1.0f}
+		{1.0f, 1.0f, 1.0f, 1.0f}		// Color of background, basically 
 	};
 	renderPassBeginInfo.pClearValues = clearValues;								// List of clear values (TODO: depth attachment clear value)
 	renderPassBeginInfo.clearValueCount = 1;
