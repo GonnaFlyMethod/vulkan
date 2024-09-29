@@ -8,7 +8,7 @@ Mesh::Mesh()
 
 Mesh::Mesh(VkPhysicalDevice newPhysicalDevice, VkDevice newDevice, std::vector<Vertex>* vertices)
 {
-	vertexCount = vertices->size();
+	vertexCount = (int)vertices->size();
 	physicalDevice = newPhysicalDevice;
 	device = newDevice;
 	createVertexBuffer(vertices);
@@ -35,7 +35,7 @@ Mesh::~Mesh()
 {
 }
 
-VkBuffer Mesh::createVertexBuffer(std::vector<Vertex>* vertices)
+void Mesh::createVertexBuffer(std::vector<Vertex>* vertices)
 {
 	// CREATE VERTEX BUFFER
 	// Information to create a buffer (doesn't include assigning memory)
@@ -94,4 +94,6 @@ uint32_t Mesh::findMemoryTypeIndex(uint32_t allowedTypes, VkMemoryPropertyFlags 
 			return i;
 		}
 	}
+
+	throw std::runtime_error("no appropriate device memory types");
 }
