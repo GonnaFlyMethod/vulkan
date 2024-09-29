@@ -12,9 +12,14 @@ int VulkanRenderer::init(GLFWwindow * newWindow) {
 
 		// Creating mesh
 		std::vector<Vertex> meshVertices = {
-			{{0.0, -0.4, 0.0}},
+			{{-0.4, -0.4, 0.0}},
+			{{0.4, -0.4, 0.0}},
 			{{0.4, 0.4, 0.0}},
-			{{-0.4, 0.4, 0.0}}
+
+			{{0.4, 0.4, 0.0}},
+			{{-0.4, 0.4, 0.0}},
+			{{-0.4, -0.4, 0.0}},
+
 		};
 		
 		firstMesh = Mesh(mainDevice.physicalDevice, mainDevice.logicalDevice, &meshVertices);
