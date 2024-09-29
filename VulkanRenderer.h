@@ -62,6 +62,7 @@ private:
 	// - Synchronisation
 	std::vector<VkSemaphore> imageAvailable;
 	std::vector<VkSemaphore> renderFinished;
+	std::vector<VkFence> drawFences;
 
 	// Vulkan functions
 	void createInstance();
