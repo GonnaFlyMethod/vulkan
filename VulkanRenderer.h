@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <array>
 
+#include "Mesh.h"
+
 #include "Utilities.h"
 
 
@@ -19,10 +21,15 @@ public:
 	void draw();
 	void cleanup();
 
+	VulkanRenderer();
+
 private:
 	GLFWwindow *window;
 
 	int currentFrame = 0;
+
+	// Scene objects
+	Mesh firstMesh;
 
 	// Vulkan Components
 	VkInstance instance;
