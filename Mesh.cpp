@@ -61,7 +61,6 @@ void Mesh::createVertexBuffer(
 	VkCommandPool transferCommandPool,
 	std::vector<Vertex>* vertices)
 {
-
 	// Get size of buffer needed for vertices
 	VkDeviceSize bufferSize = sizeof(Vertex) * vertices->size();
 
