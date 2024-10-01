@@ -61,6 +61,23 @@ int VulkanRenderer::init(GLFWwindow * newWindow) {
 			},	// 3
 		};
 
+		std::vector<Vertex> meshVertices3 = {
+
+			// 1st triangle
+			{
+				{0.0, -0.9, 0.0},	// Vertex position 
+				{1.0, 0.0, 0.0}		// Vertex color
+			},	// 0
+			{
+				{0.5, -0.5, 0.0},	// Vertex position
+				{1.0, 1.0, 0.0}		// Vertex color
+			},	// 1
+			{
+				{-0.5, -0.5, 0.0},	// Vertex position
+				{0.0, 0.0, 1.0}		// Vertex color
+			},	// 2
+		};
+
 		// Index data
 		std::vector<uint32_t> meshIndices = {
 			0, 1, 2,		// 1st triangle
@@ -83,8 +100,17 @@ int VulkanRenderer::init(GLFWwindow * newWindow) {
 			&meshVertices2,
 			&meshIndices);
 
+		Mesh thirdMesh = Mesh(
+			mainDevice.physicalDevice,
+			mainDevice.logicalDevice,
+			graphicsQueue,
+			graphicsCommandPool,
+			&meshVertices3,
+			&meshIndices);
+
 		meshList.push_back(firstMesh);
 		meshList.push_back(secondMesh);
+		meshList.push_back(thirdMesh);
 
 		createCommandBuffers();
 		recordCommands();
