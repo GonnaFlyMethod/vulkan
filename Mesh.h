@@ -15,12 +15,16 @@ public:
 		VkDevice newDevice, 
 		VkQueue transferQueue, 
 		VkCommandPool transferCommandPool,  
-		std::vector<Vertex>* vertices);
+		std::vector<Vertex>* vertices, 
+		std::vector<uint32_t>* indices);
 
 	int getVertexCount();
 	VkBuffer getVertexBuffer();
 
-	void destroyVertexBuffer();
+	int getIndexCount();
+	VkBuffer getIndexBuffer();
+
+	void destroyBuffers();
 
 	~Mesh();
 
@@ -29,6 +33,10 @@ private:
 	VkBuffer vertexBuffer;
 	VkDeviceMemory vertexBufferMemory;
 
+	int indexCount;
+	VkBuffer indexBuffer;
+	VkDeviceMemory indexBufferMemory;
+
 	VkPhysicalDevice physicalDevice;
 	VkDevice device;
 
@@ -36,5 +44,8 @@ private:
 		VkQueue transferQueue,
 		VkCommandPool transferCommandPool,
 		std::vector<Vertex>* vertices);
+	void createIndexBuffer(VkQueue transferQueue,
+		VkCommandPool transferCommandPool,
+		std::vector<uint32_t>* indices);
 };
 
