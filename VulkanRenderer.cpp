@@ -235,17 +235,9 @@ void VulkanRenderer::cleanup()
 	vkDestroySwapchainKHR(mainDevice.logicalDevice, swapchain, nullptr);
 	vkDestroySurfaceKHR(instance, surface, nullptr);
 	vkDestroyDevice(mainDevice.logicalDevice, nullptr);
-	if (validationEnabled)
-	{
-		DestroyDebugReportCallbackEXT(instance, callback, nullptr);
-	}
 	vkDestroyInstance(instance, nullptr);
 }
 
-
-VulkanRenderer::~VulkanRenderer()
-{
-}
 
 void VulkanRenderer::createInstance() {
 	// Information about the application itself

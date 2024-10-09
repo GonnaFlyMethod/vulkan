@@ -3,10 +3,13 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+#include <algorithm>
 #include <stdexcept>
 #include <vector>
 #include <set>
-#include <algorithm>
 #include <array>
 
 #include "Mesh.h"
@@ -90,7 +93,6 @@ private:
 
 	// Vulkan functions
 	void createInstance();
-	void createDebugCallback();
 	void createLogicalDevice();
 	void createSurface();
 	void createSwapChain();
@@ -102,6 +104,7 @@ private:
 	void createCommandBuffers();
 	void createSynchronisation();
 	void createUniformBuffers();
+	void createDescriptorSets();
 	void createDescriptorPool();
 	
 	void recordCommands();
@@ -109,6 +112,10 @@ private:
 	void getPhysicalDevice();
 
 	bool checkInstanceExtensionsSupport(std::vector<const char*>* checkExtensions);
+
+
+	void updateModel(glm::mat4 newModel);
+	void updateUniformBuffer(uint32_t imageIndex);
 	
 	bool checkDeviceSuitable(VkPhysicalDevice device);
 	bool checkDeviceExtensionSupport(VkPhysicalDevice device);
