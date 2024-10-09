@@ -120,6 +120,7 @@ int VulkanRenderer::init(GLFWwindow * newWindow)
 
 		meshList.push_back(firstMesh);
 		meshList.push_back(secondMesh);
+		meshList.push_back(thirdMesh);
 
 		createCommandBuffers();
 		createUniformBuffers();
@@ -945,7 +946,7 @@ void VulkanRenderer::recordCommands()
 	renderPassBeginInfo.renderArea.offset = { 0, 0 };						// Start point of render pass in pixels
 	renderPassBeginInfo.renderArea.extent = swapchainExtent;				// Size of region to run render pass on (starting at offset)
 	VkClearValue clearValues[] = {
-		{0.6f, 0.65f, 0.4, 1.0f}
+		{1.0f, 1.0f, 1.0, 1.0f}
 	};
 	renderPassBeginInfo.pClearValues = clearValues;							// List of clear values (TODO: Depth Attachment Clear Value)
 	renderPassBeginInfo.clearValueCount = 1;
