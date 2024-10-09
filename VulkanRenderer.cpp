@@ -177,7 +177,6 @@ void VulkanRenderer::draw()
 		throw std::runtime_error("Failed to submit Command Buffer to Queue!");
 	}
 
-
 	// -- PRESENT RENDERED IMAGE TO SCREEN --
 	VkPresentInfoKHR presentInfo = {};
 	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -962,31 +961,31 @@ void VulkanRenderer::recordCommands()
 			throw std::runtime_error("Failed to start recording a Command Buffer!");
 		}
 
-			// Begin Render Pass
-			vkCmdBeginRenderPass(commandBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+		// Begin Render Pass
+		vkCmdBeginRenderPass(commandBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-				// Bind Pipeline to be used in render pass
-				vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+		// Bind Pipeline to be used in render pass
+		vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 
-				for (size_t j = 0; j < meshList.size(); j++)
-				{
-					VkBuffer vertexBuffers[] = { meshList[j].getVertexBuffer() };					// Buffers to bind
-					VkDeviceSize offsets[] = { 0 };												// Offsets into buffers being bound
-					vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);	// Command to bind vertex buffer before drawing with them
+		for (size_t j = 0; j < meshList.size(); j++)
+		{
+			VkBuffer vertexBuffers[] = { meshList[j].getVertexBuffer() };					// Buffers to bind
+			VkDeviceSize offsets[] = { 0 };												// Offsets into buffers being bound
+			vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);	// Command to bind vertex buffer before drawing with them
 
-					// Bind mesh index buffer, with 0 offset and using the uint32 type
-					vkCmdBindIndexBuffer(commandBuffers[i], meshList[j].getIndexBuffer(), 0, VK_INDEX_TYPE_UINT32);
+			// Bind mesh index buffer, with 0 offset and using the uint32 type
+			vkCmdBindIndexBuffer(commandBuffers[i], meshList[j].getIndexBuffer(), 0, VK_INDEX_TYPE_UINT32);
 
-					// Bind Descriptor Sets
-					vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout,
-						0, 1, &descriptorSets[i], 0, nullptr);
+			// Bind Descriptor Sets
+			vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout,
+				0, 1, &descriptorSets[i], 0, nullptr);
 
-					// Execute pipeline
-					vkCmdDrawIndexed(commandBuffers[i], meshList[j].getIndexCount(), 1, 0, 0, 0);
-				}
+			// Execute pipeline
+			vkCmdDrawIndexed(commandBuffers[i], meshList[j].getIndexCount(), 1, 0, 0, 0);
+		}
 
-			// End Render Pass
-			vkCmdEndRenderPass(commandBuffers[i]);
+		// End Render Pass
+		vkCmdEndRenderPass(commandBuffers[i]);
 
 		// Stop recording to command buffer
 		result = vkEndCommandBuffer(commandBuffers[i]);

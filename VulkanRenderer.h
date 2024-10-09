@@ -21,6 +21,9 @@ class VulkanRenderer
 {
 public:
 	int init(GLFWwindow* newWindow);
+
+	void updateModel(glm::mat4 newModel);
+	
 	void draw();
 	void cleanup();
 
@@ -114,7 +117,6 @@ private:
 	bool checkInstanceExtensionsSupport(std::vector<const char*>* checkExtensions);
 
 
-	void updateModel(glm::mat4 newModel);
 	void updateUniformBuffer(uint32_t imageIndex);
 	
 	bool checkDeviceSuitable(VkPhysicalDevice device);
