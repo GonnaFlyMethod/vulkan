@@ -39,11 +39,10 @@ private:
 
 	// Scene Settings
 
-	struct MVP {
+	struct UboViewProjection {
 		glm::mat4 projection;
 		glm::mat4 view;
-		glm::mat4 model;
-	} mvp;
+	} uboViewProjection;
 
 	// - Descriptors
 	VkDescriptorSetLayout descriptorSetLayout;
@@ -51,8 +50,11 @@ private:
 	VkDescriptorPool descriptorPool;
 	std::vector<VkDescriptorSet> descriptorSets;
 
-	std::vector<VkBuffer> uniformBuffer;
-	std::vector<VkDeviceMemory> uniformBufferMemory;
+	std::vector<VkBuffer> vpUniformBuffer;
+	std::vector<VkDeviceMemory> vpUniformBufferMemory;
+
+	std::vector<VkBuffer> modelDUniformBuffer;
+	std::vector<VkDeviceMemory> modelDUniformBufferMemory;
 
 	// Vulkan Components
 	VkInstance instance;
@@ -76,11 +78,16 @@ private:
 	std::vector<VkFramebuffer> swapchainFrameBuffers;
 	std::vector<VkCommandBuffer> commandBuffers;
 
+	UboModel* modelTransferSpace;
+
 	// - Pipeline
 
 	VkPipeline graphicsPipeline;
 	VkPipelineLayout pipelineLayout;
 	VkRenderPass renderPass;
+
+	VkDeviceSize minUniformBufferOffset;
+	size_t modelUniformAlligment;
 
 	// - Pools
 	VkCommandPool graphicsCommandPool;
@@ -116,8 +123,10 @@ private:
 
 	bool checkInstanceExtensionsSupport(std::vector<const char*>* checkExtensions);
 
+	void updateUniformBuffers(uint32_t imageIndex);
 
-	void updateUniformBuffer(uint32_t imageIndex);
+	// - Allocate functions
+	void allocateDynamicBufferTransferSpace();
 	
 	bool checkDeviceSuitable(VkPhysicalDevice device);
 	bool checkDeviceExtensionSupport(VkPhysicalDevice device);

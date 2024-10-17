@@ -3,9 +3,18 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
+
 #include <vector>
 
 #include "Utilities.h"
+
+struct UboModel {
+	glm::mat4 model;
+};
+
+
+
+
 
 class Mesh
 {
@@ -18,6 +27,9 @@ public:
 		std::vector<Vertex>* vertices, 
 		std::vector<uint32_t>* indices);
 
+	void setModel(glm::mat4 newModel); 
+	UboModel getModel();
+
 	int getVertexCount();
 	VkBuffer getVertexBuffer();
 
@@ -29,6 +41,8 @@ public:
 	~Mesh();
 
 private:
+	UboModel uboModel;
+
 	int vertexCount;
 	VkBuffer vertexBuffer;
 	VkDeviceMemory vertexBufferMemory;
@@ -47,5 +61,6 @@ private:
 	void createIndexBuffer(VkQueue transferQueue,
 		VkCommandPool transferCommandPool,
 		std::vector<uint32_t>* indices);
+
 };
 
