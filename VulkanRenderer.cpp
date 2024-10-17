@@ -35,11 +35,11 @@ int VulkanRenderer::init(GLFWwindow * newWindow)
 				{0.0, 0.0, 1.0}		// Vertex color
 			},	// 0
 			{
-				{-0.1, -0.4, 0.0},	// Vertex position
+				{0.9, -0.4, 0.0},	// Vertex position
 				{1.0, 0.0, 0.0}		// Vertex color
 			},	// 1
 			{
-				{-0.1, 0.4, 0.0},	// Vertex position
+				{0.9, 0.4, 0.0},	// Vertex position
 				{1.0, 0.0, 0.0}		// Vertex color
 			},	// 2
 			{
@@ -95,9 +95,9 @@ int VulkanRenderer::init(GLFWwindow * newWindow)
 		meshList.push_back(firstMesh);
 		meshList.push_back(secondMesh);
 
-		glm::mat4 meshmodelmatrix = meshList[0].getModel().model;
+		/*glm::mat4 meshmodelmatrix = meshList[0].getModel().model;
 		meshmodelmatrix = glm::rotate(meshmodelmatrix, glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		meshList[0].setModel(meshmodelmatrix);
+		meshList[0].setModel(meshmodelmatrix);*/
 
 		createCommandBuffers();
 		//allocateDynamicBufferTransferSpace();
