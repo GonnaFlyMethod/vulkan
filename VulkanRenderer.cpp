@@ -1071,10 +1071,7 @@ void VulkanRenderer::recordCommands(uint32_t currentImage)
 	{
 		throw std::runtime_error("Failed to stop recording a Command Buffer!");
 	}
-	
 }
-
-
 
 void VulkanRenderer::getPhysicalDevice()
 {
