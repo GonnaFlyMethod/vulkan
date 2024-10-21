@@ -25,7 +25,7 @@ int VulkanRenderer::init(GLFWwindow * newWindow)
 		createCommandPool();
 
 		uboViewProjection.projection = glm::perspective(glm::radians(45.0f), (float)swapchainExtent.width / (float)swapchainExtent.height, 0.1f, 100.0f);
-		uboViewProjection.view = glm::lookAt(glm::vec3(0.0f, 0.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		uboViewProjection.view = glm::lookAt(glm::vec3(3.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, -4.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
 		uboViewProjection.projection[1][1] *= -1;
 
