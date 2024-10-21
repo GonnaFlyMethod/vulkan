@@ -58,7 +58,7 @@ int main()
 		firstModel = glm::rotate(firstModel, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
 
 		secondModel = glm::translate(secondModel, glm::vec3(0.0f, 0.0f, -5.0f));
-		secondModel = glm::rotate(secondModel, glm::radians(-angle * 10), glm::vec3(0.0f, 0.0f, 1.0f));
+		secondModel = glm::rotate(secondModel, glm::radians(-angle * 100), glm::vec3(0.0f, 0.0f, 1.0f));
 
 		vulkanRenderer.updateModel(0, firstModel);
 		vulkanRenderer.updateModel(1, secondModel);
