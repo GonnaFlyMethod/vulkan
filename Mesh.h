@@ -3,7 +3,6 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
-
 #include <vector>
 
 #include "Utilities.h"
@@ -12,20 +11,19 @@ struct Model {
 	glm::mat4 model;
 };
 
-
 class Mesh
 {
 public:
 	Mesh();
-	Mesh(VkPhysicalDevice newPhysicalDevice, 
-		VkDevice newDevice, 
-		VkQueue transferQueue, 
-		VkCommandPool transferCommandPool,  
-		std::vector<Vertex>* vertices, 
-		std::vector<uint32_t>* indices);
+	Mesh(VkPhysicalDevice newPhysicalDevice, VkDevice newDevice, 
+		VkQueue transferQueue, VkCommandPool transferCommandPool, 
+		std::vector<Vertex> * vertices, std::vector<uint32_t> * indices,
+		int newTexId);
 
-	void setModel(glm::mat4 newModel); 
+	void setModel(glm::mat4 newModel);
 	Model getModel();
+
+	int getTexId();
 
 	int getVertexCount();
 	VkBuffer getVertexBuffer();
@@ -39,6 +37,7 @@ public:
 
 private:
 	Model model;
+	int texId;
 
 	int vertexCount;
 	VkBuffer vertexBuffer;
@@ -51,13 +50,7 @@ private:
 	VkPhysicalDevice physicalDevice;
 	VkDevice device;
 
-	void createVertexBuffer(
-		VkQueue transferQueue,
-		VkCommandPool transferCommandPool,
-		std::vector<Vertex>* vertices);
-	void createIndexBuffer(VkQueue transferQueue,
-		VkCommandPool transferCommandPool,
-		std::vector<uint32_t>* indices);
-
+	void createVertexBuffer(VkQueue transferQueue, VkCommandPool transferCommandPool, std::vector<Vertex> * vertices);
+	void createIndexBuffer(VkQueue transferQueue, VkCommandPool transferCommandPool, std::vector<uint32_t> * indices);
 };
 
