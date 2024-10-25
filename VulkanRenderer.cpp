@@ -39,10 +39,10 @@ int VulkanRenderer::init(GLFWwindow * newWindow)
 		// Create a mesh
 		// Vertex Data
 		std::vector<Vertex> meshVertices = {
-			{ { -0.4, 0.4, 0.0 },{ 1.0f, 0.0f, 0.0f },{ 1.0f, 1.0f } },	// 0
-		{ { -0.4, -0.4, 0.0 },{ 1.0f, 0.0f, 0.0f },{ 1.0f, 0.0f } },	    // 1
-		{ { 0.4, -0.4, 0.0 },{ 1.0f, 0.0f, 0.0f },{ 0.0f, 0.0f } },    // 2
-		{ { 0.4, 0.4, 0.0 },{ 1.0f, 0.0f, 0.0f },{ 0.0f, 1.0f } },   // 3
+			{ { -0.4, 0.4, 0.0 },{ 1.0f, 0.0f, 0.0f },{ 0.0f, 0.0f } },	// 0
+		{ { -0.4, -0.4, 0.0 },{ 1.0f, 0.0f, 0.0f },{ 0.0f, 1.0f } },	    // 1
+		{ { 0.4, -0.4, 0.0 },{ 1.0f, 0.0f, 0.0f },{ 1.0f, 1.0f } },    // 2
+		{ { 0.4, 0.4, 0.0 },{ 1.0f, 0.0f, 0.0f },{ 1.0f, 0.0f } },   // 3
 		};
 
 		std::vector<Vertex> meshVertices2 = {
@@ -61,11 +61,11 @@ int VulkanRenderer::init(GLFWwindow * newWindow)
 		Mesh firstMesh = Mesh(mainDevice.physicalDevice, mainDevice.logicalDevice,
 			graphicsQueue, graphicsCommandPool,
 			&meshVertices, &meshIndices,
-			createTexture("wood.jpg"));
+			createTexture("pine.jpg"));
 		Mesh secondMesh = Mesh(mainDevice.physicalDevice, mainDevice.logicalDevice,
 			graphicsQueue, graphicsCommandPool,
 			&meshVertices2, &meshIndices,
-			createTexture("wood.jpg"));
+			createTexture("metal.jpg"));
 
 		meshList.push_back(firstMesh);
 		meshList.push_back(secondMesh);
