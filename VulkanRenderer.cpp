@@ -38,10 +38,6 @@ int VulkanRenderer::init(GLFWwindow * newWindow)
 
 		// create default "no texture" fallback
 		createTexture("plain.png");
-
-		createMeshModel("Models/13463_Australian_Cattle_Dog_v3.obj");
-		glm::mat4 testMat = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		modelList[0].setModel(testMat);
 	}
 	catch (const std::runtime_error &e) {
 		printf("ERROR: %s\n", e.what());
@@ -53,9 +49,9 @@ int VulkanRenderer::init(GLFWwindow * newWindow)
 
 void VulkanRenderer::updateModel(int modelId, glm::mat4 newModel)
 {
-	if (modelId >= meshList.size()) return;
+	if (modelId >= modelList.size()) return;
 
-	meshList[modelId].setModel(newModel);
+	modelList[modelId].setModel(newModel);
 }
 
 void VulkanRenderer::draw()
@@ -151,10 +147,6 @@ void VulkanRenderer::cleanup()
 		vkFreeMemory(mainDevice.logicalDevice, vpUniformBufferMemory[i], nullptr);
 		//vkDestroyBuffer(mainDevice.logicalDevice, modelDUniformBuffer[i], nullptr);
 		//vkFreeMemory(mainDevice.logicalDevice, modelDUniformBufferMemory[i], nullptr);
-	}
-	for (size_t i = 0; i < meshList.size(); i++)
-	{
-		meshList[i].destroyBuffers();
 	}
 	for (size_t i = 0; i < MAX_FRAME_DRAWS; i++)
 	{
