@@ -40,7 +40,7 @@ int main()
 	float deltaTime = 0.0f;
 	float lastTime = 0.0f;
 
-	vulkanRenderer.createMeshModel("Models/13463_Australian_Cattle_Dog_v3.obj");
+	int modelListPosition = vulkanRenderer.createMeshModel("Models/13463_Australian_Cattle_Dog_v3.obj");
 
 
 	// Loop until closed
@@ -58,7 +58,7 @@ int main()
 		glm::mat4 testMat = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		testMat = glm::rotate(testMat, glm::radians(angle * 5.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		
-		vulkanRenderer.updateModel(0, testMat);
+		vulkanRenderer.updateModel(modelListPosition, testMat);
 
 		vulkanRenderer.draw();
 	}
