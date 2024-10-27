@@ -108,13 +108,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)/externals/GLFW/include;$(SolutionDir)/externals/GLM;A:/Vulkan/Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/externals/GLFW/include;$(SolutionDir)/externals/GLM;A:/Vulkan/Include;$(SolutionDir)/externals/ASSIMP/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>NotSet</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)/externals/GLFW/lib-vc2022;A:/Vulkan/Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)/externals/GLFW/lib-vc2022;A:/Vulkan/Lib;$(SolutionDir)/externals/ASSIMP/lib/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <TargetMachine>NotSet</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -137,10 +137,12 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="MeshModel.cpp" />
     <ClCompile Include="VulkanRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="MeshModel.h" />
     <ClInclude Include="Utilities.h" />
     <ClInclude Include="VulkanRenderer.h" />
   </ItemGroup>

@@ -6,6 +6,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 #include <stdexcept>
 #include <vector>
 #include <set>
@@ -15,6 +19,8 @@
 #include "stb_image.h"
 
 #include "Mesh.h"
+#include "MeshModel.h"
+
 #include "Utilities.h"
 
 class VulkanRenderer
@@ -89,6 +95,7 @@ private:
 	//UboModel * modelTransferSpace;
 
 	// - Assets
+	std::vector<MeshModel> modelList;
 	
 	std::vector<VkImage> textureImages;
 	std::vector<VkDeviceMemory> textureImageMemory;
@@ -114,7 +121,6 @@ private:
 	// Vulkan Functions
 	// - Create Functions
 	void createInstance();
-	void createDebugCallback();
 	void createLogicalDevice();
 	void createSurface();
 	void createSwapChain();
@@ -170,6 +176,8 @@ private:
 	int createTextureImage(std::string fileName);
 	int createTexture(std::string fileName);
 	int createTextureDescriptor(VkImageView textureImage);
+
+	void createMeshModel(std::string modelFile);
 
 	// -- Loader Functions
 	stbi_uc * loadTextureFile(std::string fileName, int * width, int * height, VkDeviceSize * imageSize);
