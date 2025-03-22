@@ -18,10 +18,10 @@ GitHub
 
 ## Getting Started
 Prerequisites:
-* A system with Vulkan-compatible hardware and drivers.;
-* C++14 compatible compiler.;
+* A system with Vulkan-compatible hardware and drivers;
+* C++14 compatible compiler;
 * Visual Studio 2022;
-* x86-64 based CPU
+* x86-64 based CPU;
 
 ## Building the Project:
 ### Additional Include Directories
