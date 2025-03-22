@@ -1,11 +1,9 @@
 # Vulkan project
-
-## Screenshots
-
-![](./media/Screenshot.png)
-
 This project is a Vulkan-based renderer developed to demonstrate and assemble key components of the Vulkan API. It serves as a foundational 
 framework for understanding and experimenting with Vulkan's capabilities in graphics rendering.​
+
+## Screenshots
+![](./Media/Screenshot.png)
 
 ## Features
 * Vulkan Integration: Utilizes Vulkan for high-performance, low-level graphics rendering.​
