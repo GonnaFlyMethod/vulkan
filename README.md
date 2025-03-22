@@ -33,7 +33,8 @@ Note: you need to specify `<Path to your Vulkan installation>/Include` by yourse
 
 ### Additional Library Directories
 
-In Visual Studio, right click on the project's name -> Properties -> Linker -> General,
+In Visual Studio, right click on the project's name -> Properties -> Linker -> General.
+
 Add
 ```
 $(SolutionDir)/externals/GLFW/lib-vc2022;<Path to your Vulkan installation>/Lib;$(SolutionDir)/externals/ASSIMP/lib/Release;%(AdditionalLibraryDirectories)
