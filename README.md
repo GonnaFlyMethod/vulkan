@@ -7,13 +7,8 @@ framework for understanding and experimenting with Vulkan's capabilities in grap
 
 ## Features
 * Vulkan Integration: Utilizes Vulkan for high-performance, low-level graphics rendering.​
-
 * Model Loading: Supports loading and rendering of 3D models.​
-GitHub
-
 * Shader Management: Implements shader compilation and management for customizable rendering effects.​
-GitHub
-
 * Texture Mapping: Incorporates texture loading and mapping to enhance visual detail.​
 
 ## Getting Started
